@@ -55,10 +55,22 @@ const STORAGE_KEY = "todo-storage";
 
 let contrat = null;
 
-const eos = Eos.Localnet({
+
+function outputObj(obj) {
+	var description = "";
+	for (var i in obj) {
+		description += i + " = " + obj[i] + "\n";
+	}
+	console.log("obj:"+description);
+}
+
+//const eos = Eos()
+const eos = Eos({
   keyProvider: config.eos.keyProvider,
   httpEndpoint: config.eos.httpEndpoint
 });
+console.log("Eos instance: "+eos)
+//outputObj(eos)
 
 export default {
   name: "app",
@@ -98,7 +110,7 @@ export default {
       this.newTodo = "";
     },
     async removeTodo(todo) {
-      const result = await contrat.remove(todo.id, config.eos.contract.scope, {
+      const result = await contrat.remove(config.eos.contract.scope, todo.id, {
         authorization: [config.eos.contract.authorization]
       });
       this.getTodos();
@@ -119,7 +131,16 @@ export default {
   },
 
   async mounted() {
+    //eos.contract('eos.test').then((contract) => { 
+    //  console.log("connect contract of eos.test")
+    //  console.log(contract)
+    //  contract.hi("eos.a", { authorization: ['eos.a'] }).then((res) => { 
+    //    console.log("push action ok:") 
+    //    console.log(res) 
+    //    }) 
+    //})
     contrat = await eos.contract(config.eos.contract.code);
+    console.log("connect contract of "+config.eos.contract.code)
     this.getTodos();
   },
 
